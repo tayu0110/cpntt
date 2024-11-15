@@ -43,7 +43,7 @@ jobs:
         runs-on: macos-latest
         strategy:
             matrix:
-                toolchain: [stable, 1.82.0]
+                toolchain: [stable]
                 target: ["aarch64-apple-darwin"]
         steps:
             - uses: actions/checkout@v4
