@@ -15,11 +15,13 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
+                toolchain: [nightly, stable, 1.82.0]
                 target: ["x86_64-unknown-linux-musl", "x86_64-unknown-linux-gnu"]
         steps:
             - uses: actions/checkout@v4
-            - uses: dtolnay/rust-toolchain
+            - uses: dtolnay/rust-toolchain@master
               with:
+                toolchain: ${{ matrix.toolchain }}
                 targets: ${{ matrix.target }}
             - run: cargo test --tests --all-features
             - run: cargo bench --benches
@@ -27,11 +29,13 @@ jobs:
         runs-on: windows-latest
         strategy:
             matrix:
+                toolchain: [nightly, stable, 1.82.0]
                 target: ["x86_64-pc-windows-msvc"]
         steps:
             - uses: actions/checkout@v4
-            - uses: dtolnay/rust-toolchain
+            - uses: dtolnay/rust-toolchain@master
               with:
+                toolchain: ${{ matrix.toolchain }}
                 targets: ${{ matrix.target }}
             - run: cargo test --tests --all-features
             - run: cargo bench --benches
@@ -39,11 +43,13 @@ jobs:
         runs-on: macos-latest
         strategy:
             matrix:
+                toolchain: [nightly, stable, 1.82.0]
                 target: ["aarch64-apple-darwin"]
         steps:
             - uses: actions/checkout@v4
-            - uses: dtolnay/rust-toolchain
+            - uses: dtolnay/rust-toolchain@master
               with:
+                toolchain: ${{ matrix.toolchain }}
                 targets: ${{ matrix.target }}
             - run: cargo test --tests --all-features
             - run: cargo bench --benches
