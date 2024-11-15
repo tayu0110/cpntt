@@ -1,0 +1,26 @@
+[package]
+name = "cpntt"
+version = "0.1.0"
+edition = "2021"
+authors = ["tayu0110"]
+license = "CC0-1.0"
+repository = "https://github.com/tayu0110/cpntt.git"
+description = "An implementation of Number Theoretic Transform for competitive programming"
+keywords = ["competitive", "math", "fft", "ntt"]
+
+[dependencies]
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "cooley-tukey"
+harness = false
+
+[[bench]]
+name = "gentleman-sande"
+harness = false
+
+[[bench]]
+name = "ntt"
+harness = false

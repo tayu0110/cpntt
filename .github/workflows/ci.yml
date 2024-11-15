@@ -1,0 +1,49 @@
+name: ci
+
+on:
+    push:
+        branches:
+            - master
+            - develop
+        tags:
+            - '*'
+    pull_request:
+    workflow_dispatch:
+
+jobs:
+    linux:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                target: ["x86_64-unknown-linux-musl", "x86_64-unknown-linux-gnu"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: dtolnay/rust-toolchain
+              with:
+                targets: ${{ matrix.target }}
+            - run: cargo test --tests --all-features
+            - run: cargo bench --benches
+    windows:
+        runs-on: windows-latest
+        strategy:
+            matrix:
+                target: ["x86_64-pc-windows-msvc"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: dtolnay/rust-toolchain
+              with:
+                targets: ${{ matrix.target }}
+            - run: cargo test --tests --all-features
+            - run: cargo bench --benches
+    macos:
+        runs-on: macos-latest
+        strategy:
+            matrix:
+                target: ["aarch64-apple-darwin"]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: dtolnay/rust-toolchain
+              with:
+                targets: ${{ matrix.target }}
+            - run: cargo test --tests --all-features
+            - run: cargo bench --benches
