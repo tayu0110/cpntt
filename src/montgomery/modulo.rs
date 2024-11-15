@@ -9,6 +9,21 @@ use std::mem::transmute;
 
 use crate::FftCache;
 
+/// A modulus for Number Theoretic Transform.
+///
+/// Normally, this trait is implemented to ZST and only `Modulo::N` and `Modulo::PRIM_ROOT` is set.  
+/// You should not overwirte other related constants because they are derived from `Modulo::N`.
+///
+/// `Modulo::N` is used as a modulus of residue field, so it should be prime.  
+/// Additionally, this crate uses Montgomery Reduction for the implementation.  
+/// Therefore, `Modulo::N` must not be also an even number.
+///
+/// `Modulo::PRIM_ROOT` is one of the primitive root modulo `Modulo::N`.
+///
+/// # Constraint
+/// - `Modulo::N` should be a prime number.
+/// - `Modulo::N % 2 != 0` must be satisfied.
+/// - `Modulo::PRIM_ROOT` is one of the primitive root modulo `Modulo::N`.
 pub trait Modulo: Clone + marker::Copy + PartialEq + Eq + Debug {
     const N: u32;
     const N2: u32 = Self::N.wrapping_mul(2);

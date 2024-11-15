@@ -81,6 +81,14 @@ pub const fn msub<M: Modulo>(a: u32, b: u32) -> u32 {
     }
 }
 
+/// A residue field modulo `M::N`.
+///
+/// This type uses Montgomery Reduction.  
+/// In many cases it performs efficient to take the remainder by `%`,
+/// but Montgomery Reduction is useful for vectorization.
+///
+/// If `Modulo::N` is small, this type may delay normalization and the internal value may be greater than `Modulo::N`.  
+/// However, when the value is written back to `u32`, it is guaranteed to be normalized.
 #[derive(Clone, Copy, Eq)]
 pub struct M32<M: Modulo> {
     pub val: u32,
@@ -88,7 +96,6 @@ pub struct M32<M: Modulo> {
 }
 
 impl<M: Modulo> M32<M> {
-    #[inline]
     pub const fn new(val: u32) -> Self {
         Self {
             val: mmul::<M>(val, M::R2),
@@ -96,7 +103,6 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline(always)]
     pub const fn from_rawval(val: u32) -> Self {
         Self {
             val,
@@ -104,17 +110,14 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline]
     pub const fn val(&self) -> u32 {
         mrestore::<M>(mreduce::<M>(self.val))
     }
 
-    #[inline(always)]
     pub const fn rawval(&self) -> u32 {
         self.val
     }
 
-    #[inline(always)]
     pub const fn one() -> Self {
         Self {
             val: M::R,
@@ -122,7 +125,6 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline(always)]
     pub const fn zero() -> Self {
         Self {
             val: 0,
@@ -146,18 +148,15 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline]
     pub const fn nth_root(n: u32) -> Self {
         debug_assert!(n == 1 << n.trailing_zeros());
         M32::<M>::new(M::PRIM_ROOT).pow(M::N as u64 - 1 + (M::N as u64 - 1) / n as u64)
     }
 
-    #[inline(always)]
     pub const fn inv(&self) -> Self {
         self.pow(M::N as u64 - 2)
     }
 
-    #[inline]
     pub const fn add_const(self, rhs: Self) -> Self {
         M32 {
             val: madd::<M>(self.val, rhs.val),
@@ -165,7 +164,6 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline]
     pub const fn sub_const(self, rhs: Self) -> Self {
         M32 {
             val: msub::<M>(self.val, rhs.val),
@@ -173,7 +171,6 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline]
     pub const fn mul_const(self, rhs: Self) -> Self {
         M32 {
             val: mmul::<M>(self.val, rhs.val),
@@ -181,7 +178,6 @@ impl<M: Modulo> M32<M> {
         }
     }
 
-    #[inline]
     pub const fn div_const(self, rhs: Self) -> Self {
         M32 {
             val: self.mul_const(rhs.inv()).val,
@@ -192,7 +188,6 @@ impl<M: Modulo> M32<M> {
 
 impl<M: Modulo> Add for M32<M> {
     type Output = Self;
-    #[inline(always)]
     fn add(self, rhs: Self) -> Self::Output {
         self.add_const(rhs)
     }
@@ -200,7 +195,6 @@ impl<M: Modulo> Add for M32<M> {
 
 impl<M: Modulo> Sub for M32<M> {
     type Output = Self;
-    #[inline(always)]
     fn sub(self, rhs: Self) -> Self::Output {
         self.sub_const(rhs)
     }
@@ -208,7 +202,6 @@ impl<M: Modulo> Sub for M32<M> {
 
 impl<M: Modulo> Mul for M32<M> {
     type Output = Self;
-    #[inline(always)]
     fn mul(self, rhs: Self) -> Self::Output {
         self.mul_const(rhs)
     }
@@ -216,7 +209,6 @@ impl<M: Modulo> Mul for M32<M> {
 
 impl<M: Modulo> Div for M32<M> {
     type Output = Self;
-    #[inline(always)]
     fn div(self, rhs: Self) -> Self::Output {
         self.div_const(rhs)
     }

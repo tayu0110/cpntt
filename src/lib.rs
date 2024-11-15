@@ -29,10 +29,8 @@ use gentleman_sande::gentleman_sande_radix_4_butterfly_inv;
 pub use montgomery::*;
 pub use utility::*;
 
-type Modint<M> = M32<M>;
-#[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
-type Modintx8<M> = M32x8<M>;
-
+/// Apply Number Theoretic Transform to `slice`.
+///
 /// # Constraint
 /// - `slice.len()` must be a power of two.
 /// - `slice.len() <= 1 << (M::N - 1).trailing_zeros()` must be satisfied.
@@ -43,7 +41,8 @@ pub fn ntt_m32<M: Modulo>(slice: &mut [M32<M>]) {
 
     unsafe { cooley_tukey_radix_4_butterfly(n, slice, &M::CACHE) }
 }
-
+/// Apply Inverse Number Theoretic Transform to `slice`.
+///
 /// # Constraint
 /// - `slice.len()` must be a power of two.
 /// - `slice.len() <= 1 << (M::N - 1).trailing_zeros()` must be satisfied.
@@ -54,13 +53,13 @@ pub fn intt_m32<M: Modulo>(slice: &mut [M32<M>]) {
 
     unsafe { gentleman_sande_radix_4_butterfly_inv(n, slice, &M::CACHE) }
 
-    let ninv = Modint::new(n as u32).inv();
+    let ninv = M32::new(n as u32).inv();
     #[cfg(any(target_arch = "x86_64", target_arch = "x86"))]
     if n >= 8 && is_x86_feature_detected!("avx") && is_x86_feature_detected!("avx2") {
-        let ninv = Modintx8::<M>::splat(ninv);
+        let ninv = M32x8::<M>::splat(ninv);
         for v in slice.chunks_exact_mut(8) {
             unsafe {
-                let res = Modintx8::load(v.as_ptr()) * ninv;
+                let res = M32x8::load(v.as_ptr()) * ninv;
                 res.store(v.as_mut_ptr());
             }
         }
@@ -73,17 +72,33 @@ pub fn intt_m32<M: Modulo>(slice: &mut [M32<M>]) {
     }
 }
 
+/// Apply Number Theoretic Transform to `slice`.
+///
+/// After performing this method, elements of `slice` keeps to be Montgomery representation.  
+/// If you need thier normal representation, you can use `utility::m32tou32`.
+///
+/// # Constraint
+/// - `slice.len()` must be a power of two.
+/// - `slice.len() <= 1 << (M::N - 1).trailing_zeros()` must be satisfied.
 pub fn ntt_u32<M: Modulo>(slice: &mut [u32]) {
     unsafe {
         utility::u32tom32::<M>(slice);
-        let converted = transmute::<&mut [u32], &mut [Modint<M>]>(slice);
+        let converted = transmute::<&mut [u32], &mut [M32<M>]>(slice);
         ntt_m32(converted);
     }
 }
 
+/// Apply Inverse Number Theoretic Transform to `slice`.
+///
+/// This method requests that elements of `slice` are already Montgomery representation.  
+/// If you can apply this method to normal representation slice, you can use `utility::u32tom32` before execution.
+///
+/// # Constraint
+/// - `slice.len()` must be a power of two.
+/// - `slice.len() <= 1 << (M::N - 1).trailing_zeros()` must be satisfied.
 pub fn intt_u32<M: Modulo>(slice: &mut [u32]) {
     unsafe {
-        let converted = transmute::<&mut [u32], &mut [Modint<M>]>(slice);
+        let converted = transmute::<&mut [u32], &mut [M32<M>]>(slice);
         intt_m32(converted);
         utility::m32tou32::<M>(converted);
     }

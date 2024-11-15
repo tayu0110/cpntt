@@ -13,7 +13,8 @@ use crate::{
     ntt_m32, u32tom32,
 };
 
-/// Multiply each element of `a` and `b` and store in `a`.  
+/// Multiply each element of `a` and `b` and store in `a`.
+///
 /// `a.len()` and `b.len()` need not be aligned to a power of 2.
 ///
 /// # Panics

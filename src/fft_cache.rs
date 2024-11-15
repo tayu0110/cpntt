@@ -1,6 +1,7 @@
 use super::montgomery::{Modulo, M32};
 
 /// AtCoder-Library like FftCache
+///
 /// reference: https://github.com/atcoder/ac-library/blob/master/atcoder/convolution.hpp
 pub struct FftCache<M: Modulo> {
     pub root: [M32<M>; 35],

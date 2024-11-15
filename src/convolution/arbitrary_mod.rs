@@ -4,6 +4,12 @@ use crate::montgomery::{
 
 use super::{convolution, convolution_mod};
 
+/// A variant of `convolution` that can set arbitrary positive integer modulus.
+///
+/// `M` can be also an even number, an non-prime number and so on.
+///
+/// # Constraint
+/// - `M > 0` must be satisfied.
 pub fn arbitrary_convolution<const M: u32>(a: Vec<u32>, b: Vec<u32>) -> Vec<u32> {
     let c1 = convolution::<Mod880803841>(a.clone(), b.clone());
     let c2 = convolution::<Mod897581057>(a.clone(), b.clone());
@@ -30,6 +36,9 @@ pub fn arbitrary_convolution<const M: u32>(a: Vec<u32>, b: Vec<u32>) -> Vec<u32>
         .collect()
 }
 
+/// A variant of `convolution` that its modulus is `2^64`.
+///
+/// This method requests no constraint.
 pub fn convolution_mod_2_64(a: Vec<u64>, b: Vec<u64>) -> Vec<u64> {
     let c1 = convolution_mod::<Mod645922817>(
         a.iter().cloned().map(M32::from).collect(),
