@@ -15,7 +15,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                toolchain: [nightly, stable, 1.82.0]
+                toolchain: [stable]
                 target: ["x86_64-unknown-linux-musl", "x86_64-unknown-linux-gnu"]
         steps:
             - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
         runs-on: windows-latest
         strategy:
             matrix:
-                toolchain: [nightly, stable, 1.82.0]
+                toolchain: [stable]
                 target: ["x86_64-pc-windows-msvc"]
         steps:
             - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
         runs-on: macos-latest
         strategy:
             matrix:
-                toolchain: [nightly, stable, 1.82.0]
+                toolchain: [stable, 1.82.0]
                 target: ["aarch64-apple-darwin"]
         steps:
             - uses: actions/checkout@v4
